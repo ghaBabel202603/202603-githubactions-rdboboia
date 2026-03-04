@@ -14,13 +14,14 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Mostrar SO
+        shell: bash
         run: |
           echo "Este trabajo se ejecuta en un runner de Windows"
           echo "Nombre del sistema operativo: $RUNNER_OS"
-  macos-echo:
-    runs-on: macos-latest
-    steps:
-      - name: Mostrar SO
-        run: |
-          echo "Este trabajo se ejecuta en un runner de macOS"
-          echo "Nombre del sistema operativo: $RUNNER_OS"
+#  macos-echo:
+#    runs-on: macos-latest
+#    steps:
+#      - name: Mostrar SO
+#        run: |
+#          echo "Este trabajo se ejecuta en un runner de macOS"
+#          echo "Nombre del sistema operativo: $RUNNER_OS"
