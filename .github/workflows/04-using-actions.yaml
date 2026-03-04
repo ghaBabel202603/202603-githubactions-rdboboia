@@ -15,11 +15,9 @@ jobs:
                   node-version: '20.x'
 
             - name: Install Dependencies
-              run: |
-                cd my-app
-                npm ci
+              working-directory: my-app
+              run: npm ci
             
             - name: Run Unit Tests
-              run: |
-                cd my-app
-                npm run test
+              working-directory: my-app
+              run: npm run test
