@@ -9,5 +9,12 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v6
 
-            - name: Printing Folders
-              run: ls -la
+            - name: Node Setup
+              uses: actions/setup-node@v6
+              with:
+                  node-version: '20.x'
+
+            - name: Install Dependencies
+              run: |
+                cd my-app
+                npm install
