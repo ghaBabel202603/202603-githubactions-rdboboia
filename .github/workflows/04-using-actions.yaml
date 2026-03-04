@@ -17,4 +17,9 @@ jobs:
             - name: Install Dependencies
               run: |
                 cd my-app
-                npm install
+                npm ci
+            
+            - name: Run Unit Tests
+              run: |
+                cd my-app
+                npm run test
