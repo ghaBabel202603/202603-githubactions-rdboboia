@@ -1,4 +1,4 @@
-name: HELLO WORLD
+name: 01 - HELLO WORLD
 'on':
 - workflow_dispatch
 
