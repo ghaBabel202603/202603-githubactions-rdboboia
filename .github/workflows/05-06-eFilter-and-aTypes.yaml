@@ -1,4 +1,4 @@
-name: 07 - Filters and Activity Types
+name: 05 & 06 - Filters and Activity Types
 on:
   - workflow_dispatch
 jobs:
