@@ -5,6 +5,7 @@ on:
     inputs:
       debug:
         description: 'Enable debug logging'
+        type: boolean
         required: false
         default: 'false'
   push:
