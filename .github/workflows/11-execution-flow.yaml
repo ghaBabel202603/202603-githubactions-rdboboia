@@ -24,6 +24,7 @@ jobs:
               run: exit -1
     deploy-nonprod:
         runs-on: ubuntu-latest
+        continue-on-error: true
         needs: [lint-build, unit-tests]
         steps:
             - name: Deploying to non-production
