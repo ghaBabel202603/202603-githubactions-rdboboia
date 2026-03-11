@@ -1,6 +1,6 @@
 name: 08 - Expressions
 on:
-    push:
+    # push:
     workflow_dispatch:
         inputs:
             debug:
