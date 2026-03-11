@@ -5,7 +5,8 @@ on:
             pass-unit-tests:
                 description: 'Pass unit tests?'
                 required: true
-                default: 'true'
+                type: boolean
+                default: true
 
 jobs:
     lint-build:
