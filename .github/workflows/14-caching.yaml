@@ -100,7 +100,7 @@ jobs:
         if: ${{ inputs.use-cache == 'true' }}
         uses: actions/cache@v4
         with:
-          key: deps-node-modules-${{ hashFiles('14-caching/react-app/package-lock.json') }}
+          key: ${{ hashFiles('**/package-lock.json') }}
           path: 14-caching/react-app/node_modules
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
