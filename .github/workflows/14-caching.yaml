@@ -98,7 +98,7 @@ jobs:
       - name: Download cached dependencies
         id: cache
         if: ${{ inputs.use-cache == 'true' }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: deps-node-modules-${{ hashFiles('14-caching/react-app/package-lock.json') }}
           path: 14-caching/react-app/node_modules
