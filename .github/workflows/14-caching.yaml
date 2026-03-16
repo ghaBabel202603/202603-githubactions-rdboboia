@@ -71,7 +71,7 @@ on:
       use-cache:
         description: 'Whether to execute cache step'
         required: true
-        default: 'true'
+        default: true
         type: boolean
       node-version:
         description: 'Node version'
@@ -97,7 +97,7 @@ jobs:
           node-version: ${{ inputs.node-version }}
       - name: Download cached dependencies
         id: cache
-        if: ${{ inputs.use-cache == 'true' }}
+        if: ${{ inputs.use-cache == true }}
         uses: actions/cache@v4
         with:
           key: ${{ hashFiles('**/package-lock.json') }}
