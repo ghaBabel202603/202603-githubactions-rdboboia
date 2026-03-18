@@ -1,0 +1,48 @@
+# ## Objetivo
+# Familiarizarse con la creación y uso de flujos de trabajo reutilizables. (Reusable Workflows)
+
+# ## Tareas
+
+# 4. Crear un nuevo archivo de flujo de trabajo llamado 16-2-reusable-workflow.yaml en la carpeta .github/workflows en la raíz de tu repositorio.
+# 5. Las especificaciones del flujo de trabajo son las siguientes:
+#    - Nombre: 16 - 2 - Reusable Workflows.
+#    - Desencadenantes:
+#      - workflow_dispatch
+#    - Añadir un primer job llamado deploy al flujo de trabajo, con las siguientes especificaciones:
+#      - Debería usar el flujo de trabajo reutilizable definido anteriormente. Para ello, simplemente usa la key *uses* a nivel de job y pasa la ruta del flujo de trabajo: ./.github/workflows/16-1-reusable-workflows.yaml
+#      - Pasar cualquier valor como argumento de target-directory al flujo de trabajo reutilizable.
+#    - Añadir un segundo job llamado print-outputs al flujo de trabajo, con las siguientes especificaciones:
+#      - Debería ejecutarse en ubuntu-latest.
+#      - Debería tener una dependencia del job deploy.
+#      - Debería contener un único step, llamado Print outputs, que imprima los siguientes dos mensajes en la pantalla:
+#        - "Build status: [<recuperar el output build-status del job deploy>"
+#        - "URL: [<recuperar el output url del job deploy>"
+
+# 6. Confirmar los cambios y hacer push del código. Desencadenar el flujo de trabajo manualmente desde la interfaz de usuario y tómate unos momentos para inspeccionar el resultado de la ejecución del flujo de trabajo.
+
+# ## Tips
+
+# Sintaxis:
+#   - Usar *workflow_call* para reutilizar flujos de trabajo en otros flujos de trabajo.
+#   - Usar *uses* a nivel de job para reutilizar flujos de trabajo en otros flujos de trabajo.
+#   - Usar *outputs* a nivel de job para definir las salidas de un flujo de trabajo.
+#   - Usar *needs* a nivel de job para definir dependencias entre trabajos en un flujo de trabajo.
+
+name: 16 - 2 - Reusable Workflows
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/16-1-reusable-workflow.yaml
+    with:
+      target-directory: 'src'
+    
+  print-outputs:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Print outputs
+        run: |
+          echo "Build status: ${{ needs.deploy.outputs.build-status }}"
+          echo "URL: ${{ needs.deploy.outputs.url }}"
