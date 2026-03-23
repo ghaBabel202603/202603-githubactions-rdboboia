@@ -56,51 +56,96 @@
 // #             }
 // #
 
+// 3. Actualiza el archivo index.js para ejecutar los siguientes comandos si el stdout del comando git status no está vacío:
+//      - Ejecuta un comando git para cambiar a la nueva rama proporcionada a través del input target-branch.
+//      - Añade tanto los archivos package.json como package-lock.json a los archivos en staged para un commit.
+//      - Hacer commit de ambos archivos con el mensaje que consideres adecuado.
+//      - Hacer push de los cambios a la rama remota proporcionada a través del input target-branch. Es posible que tengas que añadir un -u origin ${targetBranch} después de git push para que funcione correctamente.
+//      - Abre un PR usando la API de Octokit. Aquí tienes el fragmento necesario para abrir el PR:
+//        ```javascript
+//        // Al principio del archivo, importa el paquete @actions/github
+//        const github = require('@actions/github');
+//        // Código restante
+//        const octokit = github.getOctokit(ghToken);
+//        try {
+//            await octokit.rest.pulls.create({
+//                owner: github.context.repo.owner,
+//                repo: github.context.repo.repo,
+//                title: `Update NPM dependencies`,
+//                body: `This pull request updates NPM packages`,
+//                base: baseBranch,
+//                head: targetBranch
+//            });
+//        } catch (e) {
+//               core.error('[js-dependency-update] : Something went wrong while creating the PR. Check logs below.');
+//               core.setFailed(e.message);
+//               core.error(e);
+//        }
+//        ```
 
 
 
 const core = require('@actions/core');
+const exec = require('@actions/exec');
+
 async function run() {
-  const baseBranch = core.getInput('base-branch');
-  const targetBranch = core.getInput('target-branch');
-  const workingDirectory = core.getInput('working-directory');
-  const ghToken = core.getInput('gh-token');
-  const debug = core.getBooleanInput('debug');
+  try {
+    const baseBranch = core.getInput('base-branch');
+    const targetBranch = core.getInput('target-branch');
+    const workingDirectory = core.getInput('working-directory');
+    const ghToken = core.getInput('gh-token');
+    const debug = core.getBooleanInput('debug');
+    const branchRegex = /^[a-zA-Z0-9-_.-\/]+$/;
+    const directoryRegex = /^[a-zA-Z0-9-_.-\/]+$/;
 
-  core.info(`Base branch: ${baseBranch}`);
-  core.info(`Target branch: ${targetBranch}`);
-  core.info(`Working directory: ${workingDirectory}`);
-
-  const exec = require('@actions/exec');
-  await exec.exec('npm', ['update'], { cwd: workingDirectory });
-
-  let gitStatusOutput = await exec.getExecOutput('git', ['status', '-s', 'package*.json'], { cwd: workingDirectory });
-
-  if (gitStatusOutput.stdout) {
-    core.info('There are updates available.');
-
-    // Al principio del archivo, importa el paquete @actions/github
-    const github = require('@actions/github');
-    // Código restante
-    const octokit = github.getOctokit(ghToken);
-    try {
-      await octokit.rest.pulls.create({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        title: `Update NPM dependencies`,
-        body: `This pull request updates NPM packages`,
-        base: baseBranch,
-        head: targetBranch
-      });
-    } catch (e) {
-      core.error('[js-dependency-update] : Something went wrong while creating the PR. Check logs below.');
-      core.setFailed(e.message);
-      core.error(e);
+    if (!branchRegex.test(baseBranch)) {
+      core.setFailed('The base branch name is invalid.');
+      return;
     }
-  } else {
-    core.info('There are no updates at this point in time.');
-  }
+    if (!branchRegex.test(targetBranch)) {
+      core.setFailed('The target branch name is invalid.');
+      return;
+    }
+    if (!directoryRegex.test(workingDirectory)) {
+      core.setFailed('The working directory is invalid.');
+      return;
+    }
 
+    core.info(`Base branch: ${baseBranch}`);
+    core.info(`Target branch: ${targetBranch}`);
+    core.info(`Working directory: ${workingDirectory}`);
+
+    await exec.exec('npm', ['update'], { cwd: workingDirectory });
+    let gitStatusOutput = await exec.getExecOutput('git', ['status', '-s', 'package*.json'], { cwd: workingDirectory });
+
+    if (gitStatusOutput.stdout) {
+      core.info('There are updates available.');
+      await exec.exec('git', ['checkout', '-b', targetBranch], { cwd: workingDirectory });
+      await exec.exec('git', ['add', 'package.json', 'package-lock.json'], { cwd: workingDirectory });
+      await exec.exec('git', ['commit', '-m', 'Update NPM dependencies'], { cwd: workingDirectory });
+      await exec.exec('git', ['push', '-u', 'origin', targetBranch], { cwd: workingDirectory });
+      const github = require('@actions/github');
+      const octokit = github.getOctokit(ghToken);
+      try {
+        await octokit.rest.pulls.create({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          title: `Update NPM dependencies`,
+          body: `This pull request updates NPM packages`,
+          base: baseBranch,
+          head: targetBranch
+        });
+      } catch (e) {
+        core.error('[js-dependency-update] : Something went wrong while creating the PR. Check logs below.');
+        core.setFailed(e.message);
+        core.error(e);
+      }
+    } else {
+      core.info('There are no updates at this point in time.');
+    }
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
-// Ejecuta la función run
+
 run();
