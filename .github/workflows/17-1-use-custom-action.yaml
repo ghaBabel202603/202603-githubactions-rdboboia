@@ -1,0 +1,16 @@
+name: 17 - 1 - Use Custom Action
+on:
+  workflow_dispatch:
+
+jobs:
+  mainDeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Using the custom action to cache Node and NPM dependencies
+        uses: ./.github/deploy-action
+        with:
+          node-version: '20.x'
+          working-dir: 'src'

@@ -18,6 +18,10 @@ Ejercicios:
  - [16.2 - Reusable Workflows](./ejercicios/16.2-Reusable%20Workflows.md)
  - [17.1 - Custom Composite Actions](./ejercicios/17.1-Actions.md)
  - [17.2 - Custom Composite Actions](./ejercicios/17.2-Actions.md)
-
+ - [17.3 - Custom JS Actions](./ejercicios/17.3-ActionsJS.md)
+ - [17.4 - Custom JS Actions Inputs](./ejercicios/17.4-ActionsJS.md)
+ - [17.5 - Custom JS Actions PRs](./ejercicios/17.5-ActionsJS.md)
+ - [17.6 - Custom Docker Actions](./ejercicios/17.6-ActionsDocker.md)
+ - [18 - Concurrency](./ejercicios/18-Concurrency.md)
 
 
