@@ -44,8 +44,11 @@ on:
 jobs:
   hello-to-you-docker:
     runs-on: ubuntu-latest
+    outs:
+      time: ${{ steps.hello-to-you-docker.outputs.time }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Hello to You
         id: hello-to-you-docker
         uses: ./.github/actions/hello-to-you-docker
