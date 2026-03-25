@@ -1,0 +1,59 @@
+# ## Objetivo
+# Explorar cómo configurar una acción personalizada de Docker en GitHub Actions.
+
+# El objetivo de nuestra acción personalizada de Docker es ejecutar un saludo por consola en un contenedor Docker y abstraer esa lógica detrás de una acción reutilizable fácil de usar.
+
+# ## Tareas
+# 6. Crear un archivo 17-6-custom-actions-docker.yaml en la carpeta .github/workflows en la raíz de tu repositorio.
+# 7. Nombrar el flujo de trabajo 17 - 6 - Custom Actions - Docker.
+# 8. Añadir los siguientes desencadenantes con filtros de eventos y tipos de actividad a tu flujo de trabajo:
+#     - workflow_dispatch: además, el desencadenador workflow_dispatch debería recibir un input, llamado name, de tipo string y con un valor por defecto de 'World'.
+# 9. Añadir un único trabajo llamado hello-to-you-docker al flujo de trabajo.
+# 10. Debería ejecutarse en ubuntu-latest.
+# 11. Debería contener dos steps:
+#     - El primer step debería hacer checkout del código.
+#     - El segundo step, llamado Hello to You, debería usar la acción personalizada de Docker creada en pasos anteriores. Para hacer referencia a una acción personalizada creada en el mismo repositorio que el flujo de trabajo, simplemente puedes proporcionar la ruta del directorio donde se encuentra el archivo action.yaml. En este caso, esto sería ./.github/actions/hello-to-you-docker. Asegúrate de pasar el input name a la acción personalizada.
+# 12. Confirmar los cambios y hacer push del código. Desencadenar el flujo de trabajo desde la interfaz de usuario y tómate unos momentos para inspeccionar la salida de la ejecución del flujo de trabajo.
+
+# ## Añadir parámetros de salida a la acción personalizada de Docker
+
+# 1. Modificar el archivo action.yaml para la acción personalizada de Docker:
+#    - Añadir una key 'outputs' a nivel de acción. Esta es la clave principal para definir las salidas de nuestra acción personalizada.
+#    - Añadir una salida llamada time, con una descripción de 'The time we greeted you'.
+# 2. Actualizar el script entrypoint.sh para que devuelva la hora actual en la salida de la acción, redirigiendo la variable de entorno GITHUB_OUTPUT al archivo de salida de GitHub.
+#        ```bash
+#        #!/bin/sh
+         
+#        # Use INPUT_<INPUT_NAME> to get the value of an input
+#        echo "Hello, $INPUT_NAME"
+         
+#        # Write outputs to the $GITHUB_OUTPUT file
+#        echo "time=$(date)" >>"$GITHUB_OUTPUT"
+#        ```
+# 3. Modificar el flujo de trabajo 17-6-custom-actions-docker.yaml para capturar la salida de la acción personalizada de Docker.
+# 4. Añadir un nuevo job, llamado Get the time, que debería ejecutar el script de GitHub para capturar la salida de la acción personalizada de Docker, y mostrar la hora en la consola.
+
+name: 17 - 6 - Custom Actions - Docker
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Your name'
+        required: true
+        default: 'World'
+jobs:
+  hello-to-you-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Hello to You
+        id: hello-to-you-docker
+        uses: ./.github/actions/hello-to-you-docker
+        with:
+          name: ${{ github.event.inputs.name }}
+    get-the-time:
+      runs-on: ubuntu-latest
+      needs: hello-to-you-docker
+      steps:
+        - name: Get the time
+          run: echo "The time we greeted you was ${{ needs.hello-to-you-docker.outputs.time }}"
